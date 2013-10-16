@@ -14,19 +14,19 @@ clean:
 build:
 	mkdir -p $@
 
-build/libfuse.dummy: src/lib.rs src/*.rs build
+build/libfuse.dummy: src/fuse/lib.rs src/fuse/*.rs build
 	$(RUSTC) $(RUSTFLAGS) --lib --out-dir $(dir $@) $<
 
-build/fuse_test: src/lib.rs src/*.rs build
+build/fuse_test: src/fuse/lib.rs src/*fuse/*.rs build
 	$(RUSTC) $(RUSTFLAGS) --test -o $@ $<
 
 
-EXAMPLE_SRCS=$(wildcard examples/*.rs)
-EXAMPLE_BINS=$(patsubst examples/%.rs,build/%,$(EXAMPLE_SRCS))
+EXAMPLE_SRCS=$(wildcard src/examples/*)
+EXAMPLE_BINS=$(patsubst src/examples/%,build/%,$(EXAMPLE_SRCS))
 
 examples: $(EXAMPLE_BINS)
 
 .PHONY: examples
 
-$(EXAMPLE_BINS): build/%: examples/%.rs build build/libfuse.dummy
+$(EXAMPLE_BINS): build/%: src/examples/%/main.rs build/libfuse.dummy
 	$(RUSTC) $(RUSTFLAGS) -L build --bin -o $@ $<
