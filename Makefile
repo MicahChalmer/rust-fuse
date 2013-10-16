@@ -7,7 +7,7 @@ check: build/fuse_test
 	build/fuse_test
 
 clean:
-	rm -rf build
+	rm -rf build lib bin .rust/rustpkg_db.json
 
 .PHONY: all check clean
 
@@ -21,12 +21,12 @@ build/fuse_test: src/fuse/lib.rs src/*fuse/*.rs build
 	$(RUSTC) $(RUSTFLAGS) --test -o $@ $<
 
 
-EXAMPLE_SRCS=$(wildcard src/examples/*)
-EXAMPLE_BINS=$(patsubst src/examples/%,build/%,$(EXAMPLE_SRCS))
+EXAMPLE_SRCS=$(wildcard examples/*.rs)
+EXAMPLE_BINS=$(patsubst examples/%.rs,build/%,$(EXAMPLE_SRCS))
 
 examples: $(EXAMPLE_BINS)
 
 .PHONY: examples
 
-$(EXAMPLE_BINS): build/%: src/examples/%/main.rs build/libfuse.dummy
+$(EXAMPLE_BINS): build/%: examples/%.rs build build/libfuse.dummy
 	$(RUSTC) $(RUSTFLAGS) -L build --bin -o $@ $<
